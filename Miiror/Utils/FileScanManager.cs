@@ -27,8 +27,12 @@ namespace Miiror.Utils
 
             if (miirorItem.IsFolder)
             {
-                source.AddRange(Directory.GetFileSystemEntries(miirorItem.Source, "*.*", SearchOption.AllDirectories).ToList());
-                target.AddRange(Directory.GetFileSystemEntries(miirorItem.Target, "*.*", SearchOption.AllDirectories).ToList());
+                //source.AddRange(Directory.GetFileSystemEntries(miirorItem.Source, "*.*").ToList());
+                //target.AddRange(Directory.GetFileSystemEntries(miirorItem.Target, "*.*").ToList());
+                source.AddRange(Directory.GetDirectories(miirorItem.Source, "*.*", SearchOption.AllDirectories));
+                source.AddRange(Directory.GetFiles(miirorItem.Source, "*.*", SearchOption.AllDirectories));
+                target.AddRange(Directory.GetDirectories(miirorItem.Target, "*.*", SearchOption.AllDirectories));
+                target.AddRange(Directory.GetFiles(miirorItem.Target, "*.*", SearchOption.AllDirectories));
             }
             else
             {
@@ -46,8 +50,12 @@ namespace Miiror.Utils
 
             if (miirorItem.IsFolder)
             {
-                source.AddRange(Directory.GetFileSystemEntries(miirorItem.Source, "*.*", SearchOption.AllDirectories).ToList());
-                target.AddRange(Directory.GetFileSystemEntries(miirorItem.Target, "*.*", SearchOption.AllDirectories).ToList());
+                //source.AddRange(Directory.GetFileSystemEntries(miirorItem.Source, "*.*").ToList());
+                //target.AddRange(Directory.GetFileSystemEntries(miirorItem.Target, "*.*").ToList());
+                source.AddRange(Directory.GetDirectories(miirorItem.Source, "*.*", SearchOption.AllDirectories));
+                source.AddRange(Directory.GetFiles(miirorItem.Source, "*.*", SearchOption.AllDirectories));
+                target.AddRange(Directory.GetDirectories(miirorItem.Target, "*.*", SearchOption.AllDirectories));
+                target.AddRange(Directory.GetFiles(miirorItem.Target, "*.*", SearchOption.AllDirectories));
             }
             else
             {

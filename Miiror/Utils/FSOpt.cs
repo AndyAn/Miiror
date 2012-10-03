@@ -83,7 +83,8 @@ namespace Miiror.Utils
                 switch (file.ChangeType)
                 {
                     case WatcherChangeTypes.Changed:
-                        if ((File.GetAttributes(file.NewFile) | FileAttributes.Offline) == FileAttributes.Offline)
+                        if ((File.GetAttributes(file.NewFile) | FileAttributes.Offline) == FileAttributes.Offline
+                         || (File.GetAttributes(targetPath) | FileAttributes.Offline) == FileAttributes.Offline)
                         {
                             return false;
                         }
@@ -99,6 +100,11 @@ namespace Miiror.Utils
 
                         break;
                     case WatcherChangeTypes.Deleted:
+                        if ((File.GetAttributes(targetPath) | FileAttributes.Offline) == FileAttributes.Offline)
+                        {
+                            return false;
+                        }
+
                         if (IsDirectory(targetPath))
                         {
                             Directory.Delete(targetPath, true);
@@ -132,7 +138,7 @@ namespace Miiror.Utils
             {
                 string fileName = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
 
-                File.WriteAllLines(fileName, fileList.Select(f => string.Format("{0}\t{1}", f.ChangeType, f.NewFile)), Encoding.UTF8);
+                File.WriteAllLines(fileName, fileList.Select(f => string.Format("{0}\t{1}", f.ChangeType, f.NewFile)).ToArray(), Encoding.UTF8);
 
                 Process.Start("notepad", fileName);
             }
