@@ -1,0 +1,39 @@
+﻿<Window x:Class="Miiror.BalloonBox"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Style="{DynamicResource MetroWindow}" Name="Balloon"
+        Title="BalloonBox" Height="300" Width="300" ResizeMode="NoResize" Background="#454545" Topmost="True" ShowInTaskbar="False"
+        MouseDown="Window_MouseDown" Loaded="Window_Loaded">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Miiror;component/Themes/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            
+            <Storyboard x:Key="PopupShow">
+                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Balloon" Storyboard.TargetProperty="Visibility">
+                    <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Visible}" />
+                </ObjectAnimationUsingKeyFrames>
+                <DoubleAnimation From="0" To="1" Duration="0:0:1" Storyboard.TargetName="Balloon" Storyboard.TargetProperty="Opacity" />
+            </Storyboard>
+
+            <Storyboard x:Key="PopupHide" >
+                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Balloon" Storyboard.TargetProperty="Visibility">
+                    <DiscreteObjectKeyFrame KeyTime="0:0:0.5" Value="{x:Static Visibility.Hidden}" />
+                </ObjectAnimationUsingKeyFrames>
+                <DoubleAnimation From="1" To="0" Duration="0:0:0.5" Storyboard.TargetName="Balloon" Storyboard.TargetProperty="Opacity" />
+            </Storyboard>
+            
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Border Background="#353535" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <WrapPanel Margin="10" HorizontalAlignment="Center" VerticalAlignment="Stretch">
+            <Image Source="/Miiror;component/Resources/systray.png" Width="32" Height="32" />
+            <TextBlock Name="Message" Margin="20 10 0 0"
+                       Width="180" FontSize="14" Foreground="#B0B0B0" />
+        </WrapPanel>
+    </Border>
+</Window>

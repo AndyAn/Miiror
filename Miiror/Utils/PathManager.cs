@@ -22,11 +22,21 @@ namespace Miiror.Utils
 
         public string ConvertPath(string path)
         {
-            string converted = Path.Combine(miirorItem.Target.TrimEnd('\\'), path.Replace(miirorItem.Source, "").TrimStart('\\'));
-            if (Path.GetPathRoot(converted) == "\\")
+            string converted;
+
+            try
             {
-                converted = miirorItem.Target.TrimEnd('\\') + "\\" + path.Replace(miirorItem.Source, "").TrimStart('\\');
+                converted = Path.Combine(miirorItem.Target.TrimEnd('\\'), path.Replace(miirorItem.Source, "").TrimStart('\\'));
+                if (Path.GetPathRoot(converted) == "\\")
+                {
+                    converted = miirorItem.Target.TrimEnd('\\') + "\\" + path.Replace(miirorItem.Source, "").TrimStart('\\');
+                }
             }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
             return converted;
         }
     }

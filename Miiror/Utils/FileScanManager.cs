@@ -10,9 +10,15 @@ namespace Miiror.Utils
     {
         private MiirorItem miirorItem;
 
+        public List<string> FilterList { get; set; }
+        public List<string> ReserveList { get; set; }
+
         private FileScanManager(MiirorItem mi)
         {
             miirorItem = mi;
+
+            FilterList = new List<string>();
+            ReserveList = new List<string>();
         }
 
         public static FileScanManager GetInstance(MiirorItem mi)
@@ -24,49 +30,95 @@ namespace Miiror.Utils
         {
             List<string> source = new List<string>();
             List<string> target = new List<string>();
+            List<FileItem> results;
 
-            if (miirorItem.IsFolder)
+            try
             {
-                //source.AddRange(Directory.GetFileSystemEntries(miirorItem.Source, "*.*").ToList());
-                //target.AddRange(Directory.GetFileSystemEntries(miirorItem.Target, "*.*").ToList());
-                source.AddRange(Directory.GetDirectories(miirorItem.Source, "*.*", SearchOption.AllDirectories));
-                source.AddRange(Directory.GetFiles(miirorItem.Source, "*.*", SearchOption.AllDirectories));
-                target.AddRange(Directory.GetDirectories(miirorItem.Target, "*.*", SearchOption.AllDirectories));
-                target.AddRange(Directory.GetFiles(miirorItem.Target, "*.*", SearchOption.AllDirectories));
+                if (miirorItem.IsFolder)
+                {
+                    //source.AddRange(Directory.GetFileSystemEntries(miirorItem.Source, "*.*").ToList());
+                    //target.AddRange(Directory.GetFileSystemEntries(miirorItem.Target, "*.*").ToList());
+                    source.AddRange(Directory.GetDirectories(miirorItem.Source, "*.*", SearchOption.AllDirectories));
+                    source.AddRange(Directory.GetFiles(miirorItem.Source, "*.*", SearchOption.AllDirectories));
+                    target.AddRange(Directory.GetDirectories(miirorItem.Target, "*.*", SearchOption.AllDirectories));
+                    target.AddRange(Directory.GetFiles(miirorItem.Target, "*.*", SearchOption.AllDirectories));
+                }
+                else
+                {
+                    source.Add(miirorItem.Source);
+                    target.Add(miirorItem.Target);
+                }
+
+                source = FilterFiles(source);
+                target = FilterFiles(target);
+
+                results = CompareFSO(source, target, WatcherChangeTypes.Changed);
             }
-            else
+            catch (Exception ex)
             {
-                source.Add(miirorItem.Source);
-                target.Add(miirorItem.Target);
+                throw ex;
             }
 
-            return CompareFSO(source, target, WatcherChangeTypes.Changed);
+            return results;
         }
 
         public List<FileItem> RestrictScan()
         {
             List<string> source = new List<string>();
             List<string> target = new List<string>();
+            List<FileItem> results;
 
-            if (miirorItem.IsFolder)
+            try
             {
-                //source.AddRange(Directory.GetFileSystemEntries(miirorItem.Source, "*.*").ToList());
-                //target.AddRange(Directory.GetFileSystemEntries(miirorItem.Target, "*.*").ToList());
-                source.AddRange(Directory.GetDirectories(miirorItem.Source, "*.*", SearchOption.AllDirectories));
-                source.AddRange(Directory.GetFiles(miirorItem.Source, "*.*", SearchOption.AllDirectories));
-                target.AddRange(Directory.GetDirectories(miirorItem.Target, "*.*", SearchOption.AllDirectories));
-                target.AddRange(Directory.GetFiles(miirorItem.Target, "*.*", SearchOption.AllDirectories));
-            }
-            else
-            {
-                source.Add(miirorItem.Source);
-                target.Add(miirorItem.Target);
-            }
+                if (miirorItem.IsFolder)
+                {
+                    //source.AddRange(Directory.GetFileSystemEntries(miirorItem.Source, "*.*").ToList());
+                    //target.AddRange(Directory.GetFileSystemEntries(miirorItem.Target, "*.*").ToList());
+                    source.AddRange(Directory.GetDirectories(miirorItem.Source, "*.*", SearchOption.AllDirectories));
+                    source.AddRange(Directory.GetFiles(miirorItem.Source, "*.*", SearchOption.AllDirectories));
+                    target.AddRange(Directory.GetDirectories(miirorItem.Target, "*.*", SearchOption.AllDirectories));
+                    target.AddRange(Directory.GetFiles(miirorItem.Target, "*.*", SearchOption.AllDirectories));
+                }
+                else
+                {
+                    source.Add(miirorItem.Source);
+                    target.Add(miirorItem.Target);
+                }
 
-            List<FileItem> results = CompareFSO(source, target, WatcherChangeTypes.Changed);
-            results.AddRange(CompareFSO(target, source, WatcherChangeTypes.Deleted));
+                source = FilterFiles(source);
+                target = FilterFiles(target);
+
+                results = CompareFSO(source, target, WatcherChangeTypes.Changed);
+                results.AddRange(CompareFSO(target, source, WatcherChangeTypes.Deleted));
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
 
             return results;
+        }
+
+        private List<string> FilterFiles(List<string> list)
+        {
+            List<string> newList = new List<string>();
+
+            try
+            {
+                foreach (string fileSysEntry in list)
+                {
+                    if (FSOpt.FilterFile(fileSysEntry, FilterList, ReserveList))
+                    {
+                        newList.Add(fileSysEntry);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return newList;
         }
 
         private List<FileItem> CompareFSO(List<string> source, List<string> target, WatcherChangeTypes changeType)
@@ -110,6 +162,7 @@ namespace Miiror.Utils
             catch (Exception ex)
             {
                 Log.GetInstance().WriteLog(ex.Message);
+                throw ex;
             }
 
             return results;

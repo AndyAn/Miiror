@@ -24,9 +24,14 @@ namespace Miiror.Utils
 
         private Log()
         {
-            this.MaxActiveRecord = 1000;
+            this.MaxActiveRecord = 1;
             this.LogPath = "logs";
             this.CreateLog(defaultLogName);
+
+            if (!Directory.Exists(LogPath))
+            {
+                Directory.CreateDirectory(LogPath);
+            }
         }
 
         public static Log GetInstance()
@@ -59,16 +64,16 @@ namespace Miiror.Utils
         {
             lock (locker)
             {
-                logSet[logName].Add(DateTime.Now.ToString("yyyyMMddhhmmss") + "\t" + log);
+                logSet[logName].Add(DateTime.Now.ToString("yyyyMMddHHmmss") + "\t" + log);
 
                 if (logSet[logName].Count < this.MaxActiveRecord)
                 {
                     return;
                 }
 
-                using (StreamWriter sw = new StreamWriter(string.Format(@"{0}\{1}_{2}.log", LogPath, logName, DateTime.Now.ToString("yyyyMMddhhmmss"))))
+                using (StreamWriter sw = new StreamWriter(string.Format(@"{0}\{1}_{2}.log", LogPath, logName, DateTime.Now.ToString("yyyyMMdd")), true))
                 {
-                    sw.Write(string.Join("\r\n", logSet[logName].ToArray()));
+                    sw.Write(string.Join("\r\n", logSet[logName].ToArray()) + "\r\n");
                 }
 
                 logSet[logName].Clear();
@@ -105,11 +110,6 @@ namespace Miiror.Utils
                 List<string> logs = new List<string>();
 
                 logs.AddRange(logSet[logName]);
-
-                if (!Directory.Exists(LogPath))
-                {
-                    Directory.CreateDirectory(LogPath);
-                }
 
                 string[] allLogs = Directory.GetFiles(LogPath, logName + "_*.log", SearchOption.AllDirectories);
                 foreach (string log in allLogs)

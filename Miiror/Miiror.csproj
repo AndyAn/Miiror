@@ -11,7 +11,8 @@
     <RootNamespace>Miiror</RootNamespace>
     <AssemblyName>Miiror</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -25,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -35,17 +37,21 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -55,7 +61,30 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BalloonBox.xaml.cs">
+      <DependentUpon>BalloonBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ButtonExt.cs" />
+    <Compile Include="Controls\Dialog\InternalErrorException.cs" />
+    <Compile Include="Controls\Dialog\InteropUtil.cs" />
+    <Compile Include="Controls\Dialog\OpenFileOrFolderDialog.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\Dialog\Util.cs" />
+    <Compile Include="Controls\iCheckBox.cs" />
+    <Compile Include="Controls\MetroWindow.cs" />
+    <Compile Include="Controls\NotificationAreaIcon.cs" />
+    <Compile Include="EditPanel.xaml.cs">
+      <DependentUpon>EditPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="iMiror.cs" />
+    <Compile Include="MessageBox.xaml.cs">
+      <DependentUpon>MessageBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MinimizingBox.xaml.cs">
+      <DependentUpon>MinimizingBox.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MirorGroup.cs" />
     <Compile Include="Utils\FileScanManager.cs" />
     <Compile Include="Utils\FSOList.cs" />
@@ -63,7 +92,18 @@
     <Compile Include="Utils\IconManager.cs" />
     <Compile Include="Utils\Items.cs" />
     <Compile Include="Utils\Log.cs" />
+    <Compile Include="Utils\MiirorSettings.cs" />
+    <Compile Include="Utils\ObjectSerializer.cs" />
     <Compile Include="Utils\PathManager.cs" />
+    <Compile Include="Utils\Win32API.cs" />
+    <Page Include="BalloonBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EditPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -76,7 +116,19 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Themes\Generic.xaml">
+    <Page Include="MessageBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MinimizingBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Brushes.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Controls.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -99,6 +151,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -106,26 +159,37 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\add-hover.png" />
-    <EmbeddedResource Include="Resources\add.png" />
-    <EmbeddedResource Include="Resources\add1-hover.png" />
-    <EmbeddedResource Include="Resources\add1.png" />
-    <Resource Include="Resources\check-mout.png" />
-    <Resource Include="Resources\check-mover.png" />
-    <EmbeddedResource Include="Resources\delete-hover.png" />
-    <EmbeddedResource Include="Resources\delete.png" />
-    <Resource Include="Resources\exchange-mout.png" />
-    <Resource Include="Resources\exchange-mover.png" />
-    <EmbeddedResource Include="Resources\loose-hover.png" />
-    <EmbeddedResource Include="Resources\loose.png" />
-    <EmbeddedResource Include="Resources\restrict-hover.png" />
-    <EmbeddedResource Include="Resources\restrict.png" />
-    <EmbeddedResource Include="Resources\start-hover.png" />
-    <EmbeddedResource Include="Resources\start.png" />
-    <EmbeddedResource Include="Resources\stop-hover.png" />
-    <EmbeddedResource Include="Resources\stop.png" />
-    <Resource Include="Resources\uncheck-mout.png" />
-    <Resource Include="Resources\uncheck-mover.png" />
+    <Resource Include="Resources\add.png" />
+    <Resource Include="Resources\delete.png" />
+    <Resource Include="Resources\loose.png" />
+    <Resource Include="Resources\restrict.png" />
+    <Resource Include="Resources\start.png" />
+    <Resource Include="Resources\stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\exit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\systray.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\edit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\info.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\check.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\uncheck.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\radiocheck.png" />
+    <Resource Include="Resources\radiouncheck.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="app.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

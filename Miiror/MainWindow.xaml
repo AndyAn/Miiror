@@ -1,8 +1,69 @@
 ﻿<Window x:Class="Miiror.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525">
+        xmlns:form="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        xmlns:local="clr-namespace:Miiror.Controls"
+        Style="{DynamicResource MetroWindow}" ResizeMode="CanResize"
+        Title="MainWindow" Height="518" Width="740" Background="#353535"
+        WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" StateChanged="Window_StateChanged">
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Miiror;component/Themes/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="64" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <local:NotificationAreaIcon x:Name="NotificationAreaIcon" MouseDoubleClick="NTFArea_MouseDoubleClick" >
+            <local:NotificationAreaIcon.MenuItems>
+                <form:ToolStripMenuItem Name="StartAllTool" Text="Start All" Click="StartAll_Click" />
+                <form:ToolStripMenuItem Name="StopAllTool" Text="Stop All" Click="StopAll_Click" />
+                <form:ToolStripSeparator />
+                <form:ToolStripMenuItem Name="LooseTool" Text="Loose Scan" Click="Loose_Click" />
+                <form:ToolStripMenuItem Name="RestrictTool" Text="Restrict Scan" Click="Restrict_Click" />
+                <form:ToolStripSeparator />
+                <form:ToolStripMenuItem Name="ShowTool" Text="Main Window" Click="Show_Click" />
+                <form:ToolStripMenuItem Name="ExitTool" Text="Exit" Click="Exit_Click" />
+            </local:NotificationAreaIcon.MenuItems>
+        </local:NotificationAreaIcon>
         
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="128" />
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" BorderThickness="15, 0, 0, 0" BorderBrush="#8CBF26" Background="Transparent" VerticalAlignment="Center" DockPanel.Dock="Left">
+                <TextBlock FontSize="32" FontWeight="ExtraBlack" Foreground="#1BA1E2" Height="64" VerticalAlignment="Center" Margin="10, 10, 0, 0">
+                    <Run>Miiror</Run>
+                </TextBlock>
+            </Border>
+            <Canvas Grid.Column="1">
+                <CheckBox Name="Startup" Background="#353535" Style="{DynamicResource StartupCheckBox}" Padding="7, 6, 0, 0" Content=":" Width="32" Height="32" ToolTip="Startup with Windows: True" Click="Startup_Click" />
+                <local:ButtonExt x:Name="Min" Background="#353535" Padding="8, 7, 0, 0" FontSize="16" Foreground="#FFF" FontFamily="Webdings" Content="0" Width="32" Height="32" Canvas.Left="32" ToolTip="Minimize Window" Click="Min_Click" />
+                <local:ButtonExt x:Name="Max" Background="#353535" Padding="8, 7, 0, 0" FontSize="16" Foreground="#FFF" FontFamily="Webdings" Content="1" Width="32" Height="32" Canvas.Left="64" ToolTip="Maximize Window" Click="Max_Click" />
+                <local:ButtonExt x:Name="Close" Background="#353535" Padding="8, 7, 0, 0" FontSize="16" Foreground="#FFF" FontFamily="Webdings" Content="r" Width="32" Height="32" Canvas.Left="96" ToolTip="Close Window" Click="Close_Click" />
+            </Canvas>
+        </Grid>
+        <DockPanel Margin="20, 10, 20, 20" Grid.Row="1">
+            <StackPanel Background="#353535" DockPanel.Dock="Left">
+                <local:ButtonExt x:Name="Add" Background="#353535" ImageUri="/Miiror;component/Resources/add.png" Width="48" Height="48" ToolTip="Add Monitoring" Click="Add_Click" />
+                <local:ButtonExt x:Name="Edit" Background="#353535" ImageUri="/Miiror;component/Resources/edit.png" Width="48" Height="48" ToolTip="Edit Monitoring" Click="Edit_Click" />
+                <local:ButtonExt x:Name="Delete" Background="#353535" ImageUri="/Miiror;component/Resources/delete.png" Width="48" Height="48" ToolTip="Remove Monitoring" Click="Delete_Click" />
+                <local:ButtonExt x:Name="Start" Background="#353535" ImageUri="/Miiror;component/Resources/start.png" Width="48" Height="48" ToolTip="Start Monitoring" Click="Start_Click" />
+                <local:ButtonExt x:Name="Stop" Background="#353535" ImageUri="/Miiror;component/Resources/stop.png" Width="48" Height="48" ToolTip="Stop Monitoring" Click="Stop_Click" />
+                <local:ButtonExt x:Name="LooseScan" Background="#353535" ImageUri="/Miiror;component/Resources/loose.png" Width="48" Height="48" ToolTip="Loose Synch Files" Click="LooseScan_Click" />
+                <local:ButtonExt x:Name="RestrictScan" Background="#353535" ImageUri="/Miiror;component/Resources/restrict.png" Width="48" Height="48" ToolTip="Restrict Synch Files" Click="RestrictScan_Click" />
+                <local:ButtonExt x:Name="Exit" Background="#353535" ImageUri="/Miiror;component/Resources/exit.png" Width="48" Height="48" ToolTip="Exit" Click="TExit_Click" />
+            </StackPanel>
+
+            <ListBox Name="MiList" />
+        </DockPanel>
     </Grid>
 </Window>

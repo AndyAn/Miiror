@@ -1,0 +1,67 @@
+﻿<Window x:Class="Miiror.EditPanel"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Miiror.Controls"
+        Style="{DynamicResource MetroWindow}"
+        Title="EditPanel" Height="300" Width="300" Background="#454545"
+        ShowInTaskbar="False" Loaded="Window_Loaded">
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Miiror;component/Themes/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="36" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="56" />
+            <RowDefinition Height="56" />
+        </Grid.RowDefinitions>
+        <Canvas Background="#353535" HorizontalAlignment="Stretch">
+            <TextBlock Foreground="#8CBF26" FontSize="18" FontWeight="ExtraBold" Margin="20 8 10 8">
+                <Run>Miiror:</Run>
+            </TextBlock>
+            <TextBlock Canvas.Left="100" Foreground="#8CBF26" FontSize="18" FontWeight="DemiBold" Margin="0 8 0 8">
+                <Run>Monitoring Item</Run>
+            </TextBlock>
+            <local:ButtonExt x:Name="Close" Canvas.Right="0" Content="r" 
+                             Background="#353535" FontSize="16" Foreground="#FFF" FontFamily="Webdings" 
+                             Padding="3, 3, 0, 0" Width="24" Height="24" Click="Close_Click" />
+        </Canvas>
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="64" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <local:ButtonExt x:Name="Source" Content="Drag and Drop a file/folder here [Source]" ToolTip="Source file/folder"
+                             Style="{DynamicResource AcceptButton}" Padding="20, 0, 20, 0" FontSize="18"
+                             AllowDrop="True" Click="Source_Click" DragEnter="FSE_DragEnter" Drop="FSE_Drop" />
+            <local:ButtonExt Grid.Column="1" x:Name="Exchange" Content="D" ToolTip="Switch the Source and Target"
+                             Background="#454545" Padding="7, 6, 0, 0" FontSize="18" Foreground="#FFF" FontFamily="Wingdings 3" FontWeight="ExtraBold" 
+                             Width="32" Height="32" Click="Exchange_Click" />
+            <local:ButtonExt x:Name="Target" Grid.Column="2" Content="Drag and Drop a file/folder here [Target]" ToolTip="Target file/folder"
+                             Style="{DynamicResource AcceptButton}" Padding="20, 0, 20, 0" FontSize="18"
+                             AllowDrop="True" Click="Target_Click" DragEnter="FSE_DragEnter" Drop="FSE_Drop" />
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Canvas Margin="20 0 20 0">
+                <TextBlock><Run Foreground="#B0B0B0">File Filter</Run></TextBlock>
+                <TextBox Name="FileFilter" Background="#CCC" Width="400" Canvas.Left="120" />
+            </Canvas>
+            <CheckBox Grid.Row="1" Name="Recursive" Margin="20 0 20 0" Foreground="#B0B0B0" Content="Monitor Sub-Folder" />
+        </Grid>
+        <WrapPanel Name="ButtonGroup" Grid.Row="3" HorizontalAlignment="Center" Margin="0 5 0 0">
+            <Button Name="Save" Content="Save" Style="{DynamicResource MessageBoxButton}" Click="Save_Click" />
+            <Button Name="Cancel" Content="Cancel" Style="{DynamicResource MessageBoxButton}" Click="Cancel_Click" />
+        </WrapPanel>
+    </Grid>
+</Window>

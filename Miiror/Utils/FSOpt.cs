@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Miiror.Utils
 {
@@ -35,6 +36,7 @@ namespace Miiror.Utils
             catch (Exception ex)
             {
                 Log.GetInstance().WriteLog(ex.Message);
+                throw ex;
             }
 
             return result;
@@ -66,25 +68,27 @@ namespace Miiror.Utils
                     throw new DirectoryNotFoundException("Path root doesn't exist.");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.GetInstance().WriteLog(ex.Message);
+                throw ex;
             }
         }
 
         public static bool SynchFileEntry(FileItem file, MiirorItem mi)
         {
             PathManager pm = PathManager.GetInstance(mi);
-            string targetPath = pm.ConvertPath(file.NewFile);
             bool result = false;
 
             try
             {
+                string targetPath = pm.ConvertPath(file.NewFile);
+
                 switch (file.ChangeType)
                 {
                     case WatcherChangeTypes.Changed:
                         if ((File.GetAttributes(file.NewFile) | FileAttributes.Offline) == FileAttributes.Offline
-                         || (File.GetAttributes(targetPath) | FileAttributes.Offline) == FileAttributes.Offline)
+                         || (File.Exists(targetPath) && (File.GetAttributes(targetPath) | FileAttributes.Offline) == FileAttributes.Offline))
                         {
                             return false;
                         }
@@ -126,7 +130,34 @@ namespace Miiror.Utils
             catch (Exception ex)
             {
                 result = false;
-                Log.GetInstance().WriteLog(ex.Message);
+                throw ex;
+            }
+
+            return result;
+        }
+
+        public static bool FilterFile(string file, List<string> removeList, List<string> keepList)
+        {
+            bool result = false;
+
+            try
+            {
+                string ext = Path.GetExtension(file).TrimStart('.').ToLower();
+                ext = string.IsNullOrEmpty(ext) ? ext : "*." + ext;
+
+                result = !(removeList.FindIndex(e => e.ToLower() == ext) > -1);
+                if (0 == keepList.Count || keepList.Where(l => l.IndexOf("*.*") > -1).Count() > 0)
+                {
+                    result = true;
+                }
+                else
+                {
+                    result = keepList.FindIndex(e => e.ToLower() == ext) > -1;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
 
             return result;
@@ -146,6 +177,53 @@ namespace Miiror.Utils
             {
                 Log.GetInstance().WriteLog(ex.Message);
             }
+        }
+
+        public static bool CheckMonitorPath(string monitorPath, int maxRetryCount, int reconnectSpan)
+        {
+            // The temporary folder path existence flag
+            bool isTempPathExist = false;
+
+            if (!Directory.Exists(monitorPath))
+            {
+                // Retry to connect the Temporary folder
+                int i;
+                for (i = 0; i < maxRetryCount; i++)
+                {
+                    if (ReConnect(monitorPath, reconnectSpan))
+                    {
+                        isTempPathExist = true;
+                        break;
+                    }
+                }
+
+                isTempPathExist = !(maxRetryCount == i);
+            }
+            else
+            {
+                isTempPathExist = true;
+            }
+
+            return isTempPathExist;
+        }
+
+        private static bool ReConnect(string monitorPath, int reconnectSpan)
+        {
+            try
+            {
+                if (Directory.Exists(monitorPath))
+                {
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.GetInstance().WriteLog(ex.Message);
+                return false;
+            }
+            // Retry to connect the temporary folder with certain interval time
+            Thread.Sleep(reconnectSpan);
+            return false;
         }
     }
 }

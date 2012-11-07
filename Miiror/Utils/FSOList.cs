@@ -19,15 +19,22 @@ namespace Miiror.Utils
         {
             List<FSObject> fl = new List<FSObject>();
 
-            foreach (FSObject item in list)
+            try
             {
-                if (File.Exists(item.FullPathName))
+                foreach (FSObject item in list)
                 {
-                    fl.Add(item);
+                    if (File.Exists(item.FullPathName))
+                    {
+                        fl.Add(item);
+                    }
                 }
-            }
 
-            list = fl;
+                list = fl;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public static bool IsFile(string path)
