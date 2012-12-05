@@ -14,6 +14,8 @@ using Miiror.Controls.Dialog;
 using Miiror.Controls;
 using Miiror.Utils;
 using System.Windows.Interop;
+using Miiror.Controls.Dialog.OS;
+using Forms = System.Windows.Forms;
 
 namespace Miiror
 {
@@ -72,10 +74,10 @@ namespace Miiror
 
             Margin = (owner.WindowState == WindowState.Maximized) ? new Thickness(0, 10, 0, 10) : new Thickness(10);
 
-            this.Left = (owner.WindowState == WindowState.Maximized) ? 0 : owner.Left;
-            this.Top = ((owner.WindowState == WindowState.Maximized) ? 0 : owner.Top) + owner.Height / 6;
-            this.Width = owner.Width;
-            this.Height = owner.Height / 3 * 2;
+            this.Left = owner.Location.X;
+            this.Top = (owner.Location.Y) + owner.ActualHeight / 6;
+            this.Width = owner.ActualWidth;
+            this.Height = owner.ActualHeight / 3 * 2;
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)
@@ -86,15 +88,29 @@ namespace Miiror
 
         private void Source_Click(object sender, RoutedEventArgs e)
         {
-            using (OpenFileOrFolderDialog dialog = new OpenFileOrFolderDialog())
+            using (OpenFileDialogEx dialog = new OpenFileDialogEx())
             {
-                dialog.AcceptFiles = true;
-                dialog.Path = @"C:\";
-                dialog.ShowDialog();
-                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                dialog.StartLocation = AddonWindowLocation.Right;
+                dialog.DefaultViewMode = FolderViewMode.Icon;
+                dialog.OpenDialog.InitialDirectory = Environment.SpecialFolder.MyComputer.ToString();
+                dialog.OpenDialog.AddExtension = true;
+                dialog.OpenDialog.Multiselect = false;
+                dialog.OpenDialog.ValidateNames = false;
+                //dialog.OpenDialog.Filter = "Image Files(*.bmp;*.jpg;*.gif;*.png)|*.bmp;*.jpg;*.gif;*.png";
+                //dialog.OpenDialog.SupportMultiDottedExtensions = true;
+                //dialog.OpenDialog.ShowReadOnly = true;
+                dialog.OpenDialog.ShowDialog();
+                Forms.DialogResult result = dialog.ShowDialog();
+
+                //dialog.AcceptFiles = true;
+                //dialog.Path = @"C:\";
+                //dialog.ShowDialog();
+                if (result == Forms.DialogResult.OK)
                 {
-                    Source.Content = dialog.FileNameLabel;
+                    Source.Content = dialog.OpenDialog.FileName;
                 }
+
+                dialog.Dispose();
             }
         }
 

@@ -28,10 +28,10 @@ namespace Miiror
             InitializeComponent();
             Margin = (owner.WindowState == WindowState.Maximized) ? new Thickness(0, 10, 0, 10) : new Thickness(10);
 
-            this.Width = owner.Width;
+            this.Width = owner.ActualWidth;
             this.Height = 196;
-            this.Left = (owner.WindowState == WindowState.Maximized) ? 0 : owner.Left;
-            this.Top = ((owner.WindowState == WindowState.Maximized) ? 0 : owner.Top) + (owner.Height - this.Height) / 2;
+            this.Left = owner.Location.X;
+            this.Top = owner.Location.Y + (owner.ActualHeight - Height) / 2;
 
             Title.Text = title;
             Message.Text = message;

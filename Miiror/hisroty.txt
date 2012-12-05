@@ -1,0 +1,20 @@
+﻿2012-11-14                   Version 1.0
+----------------------------------------
+* Fixed Maximize / Restore bugs.
+* Move all window files to Windows
+  folder, the folder structure looks
+  better.
+
+
+2012-11-08                   Version 1.0
+----------------------------------------
+* The first release version. Metro UI
+  with basic monitoring function.
+
+
+2012-11-07                   Version 1.0
+----------------------------------------
+* Fixed Run with Windows Start-up bugs.
+* Add a function to format JSON setting
+  data, configuration file is more
+  easier to read.

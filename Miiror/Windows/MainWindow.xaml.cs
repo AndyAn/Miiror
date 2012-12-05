@@ -31,13 +31,12 @@ namespace Miiror
     {
         internal MiirorSettings MiSettings;
         private MirorGroup mirorGroup;
-        private Rect WindowMargin = new Rect(10, 10, 0, 0);
-        private string STARTUP_TOOLTIP = "Startup with Windows: {0}";
-        private bool IsWindowLoaded = false;
+        private string STARTUP_TOOLTIP = "Run with Windows Startup: {0}";
 
         public MainWindow()
         {
             InitializeComponent();
+            Icon = IconManager.GetIcon("systray");
             Margin = new Thickness(10);
         }
 
@@ -45,16 +44,24 @@ namespace Miiror
 
         private void Window_StateChanged(object sender, EventArgs e)
         {
-            if (IsWindowLoaded)
+            if (WindowState == WindowState.Normal)
             {
-                BindListBox();
+                Max.Content = "1";
+                Max.ToolTip = "Maximize Window";
             }
+            else
+            {
+                Max.Content = "2";
+                Max.ToolTip = "Restore Down";
+            }
+
+            WindowStyleChange(WindowState);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             NotificationAreaIcon.Icon = IconManager.GetIcon("systray");
-            Hide();
+            //Hide();
 
             MiSettings = LoadConfig();
             InitializeMonitorList();
@@ -66,7 +73,6 @@ namespace Miiror
 
             MiList.PreviewMouseDoubleClick += new MouseButtonEventHandler(MiList_MouseDoubleClick);
             //AddMonitoring();
-            IsWindowLoaded = true;
 
             BalloonBox bb = new BalloonBox(this, "Miiror is started...");
             bb.Show();
@@ -301,71 +307,71 @@ namespace Miiror
             switch (msg)
             {
                 case Win32API.WM_NCHITTEST:
-                    if (this.WindowState != WindowState.Normal)
-                    {
-                        break;
-                    }
+                    //if (WindowState != WindowState.Normal)
+                    //{
+                    //    break;
+                    //}
 
-                    this.mousePoint.X = Forms.Control.MousePosition.X;
-                    this.mousePoint.Y = Forms.Control.MousePosition.Y;
+                    mousePoint.X = Forms.Control.MousePosition.X;
+                    mousePoint.Y = Forms.Control.MousePosition.Y;
 
                     #region test mouse location
 
                     // left top corner
-                    if (this.mousePoint.Y - this.Top - WindowMargin.Top <= this.agWidth
-                       && this.mousePoint.X - this.Left - WindowMargin.Left <= this.agWidth)
+                    if (mousePoint.Y - Location.Y - Margin.Top <= agWidth
+                       && mousePoint.X - Location.X - Margin.Left <= agWidth)
                     {
                         handled = true;
                         return new IntPtr((int)Win32API.HitTest.HTTOPLEFT);
                     }
                     // left bottom corner    
-                    else if (this.ActualHeight + this.Top - this.mousePoint.Y - WindowMargin.Bottom <= this.agWidth
-                       && this.mousePoint.X - this.Left - WindowMargin.Left <= this.agWidth)
+                    else if (ActualHeight + Location.Y - mousePoint.Y - Margin.Bottom <= agWidth
+                       && mousePoint.X - Location.X - Margin.Left <= agWidth)
                     {
                         handled = true;
                         return new IntPtr((int)Win32API.HitTest.HTBOTTOMLEFT);
                     }
                     // right top corner
-                    else if (this.mousePoint.Y - this.Top - WindowMargin.Top <= this.agWidth
-                       && this.ActualWidth + this.Left - this.mousePoint.X - WindowMargin.Right <= this.agWidth)
+                    else if (mousePoint.Y - Location.Y - Margin.Top <= agWidth
+                       && ActualWidth + Location.X - mousePoint.X - Margin.Right <= agWidth)
                     {
                         handled = true;
                         return new IntPtr((int)Win32API.HitTest.HTTOPRIGHT);
                     }
                     // right bottom corner
-                    else if (this.ActualWidth + this.Left - this.mousePoint.X - WindowMargin.Right <= this.agWidth
-                       && this.ActualHeight + this.Top - this.mousePoint.Y - WindowMargin.Bottom <= this.agWidth)
+                    else if (ActualWidth + Location.X - mousePoint.X - Margin.Right <= agWidth
+                       && ActualHeight + Location.Y - mousePoint.Y - Margin.Bottom <= agWidth)
                     {
                         handled = true;
                         return new IntPtr((int)Win32API.HitTest.HTBOTTOMRIGHT);
                     }
                     // left side of window
-                    else if (this.mousePoint.X - this.Left - WindowMargin.Left <= this.borderThickness)
+                    else if (mousePoint.X - Location.X - Margin.Left <= borderThickness)
                     {
                         handled = true;
                         return new IntPtr((int)Win32API.HitTest.HTLEFT);
                     }
                     // right side of window
-                    else if (this.ActualWidth + this.Left - this.mousePoint.X - WindowMargin.Right <= this.borderThickness)
+                    else if (ActualWidth + Location.X - mousePoint.X - Margin.Right <= borderThickness)
                     {
                         handled = true;
                         return new IntPtr((int)Win32API.HitTest.HTRIGHT);
                     }
                     // top of window
-                    else if (this.mousePoint.Y - this.Top - WindowMargin.Top <= this.borderThickness)
+                    else if (mousePoint.Y - Location.Y - Margin.Top <= borderThickness)
                     {
                         handled = true;
                         return new IntPtr((int)Win32API.HitTest.HTTOP);
                     }
                     // bottom of window
-                    else if (this.ActualHeight + this.Top - this.mousePoint.Y - WindowMargin.Bottom <= this.borderThickness)
+                    else if (ActualHeight + Location.Y - mousePoint.Y - Margin.Bottom <= borderThickness)
                     {
                         handled = true;
                         return new IntPtr((int)Win32API.HitTest.HTBOTTOM);
                     }
                     // moving window
-                    else if ((this.mousePoint.Y - this.Top - WindowMargin.Top <= 32 && this.mousePoint.X - this.Left - WindowMargin.Left - WindowMargin.Right <= this.Width - 160) ||
-                        (this.mousePoint.Y - this.Top - WindowMargin.Top > 32 && this.mousePoint.Y - this.Top - WindowMargin.Top <= 74))
+                    else if ((mousePoint.Y - Location.Y - Margin.Top <= 32 && mousePoint.X - Location.X - Margin.Left - Margin.Right <= ActualWidth - 160) ||
+                        (mousePoint.Y - Location.Y - Margin.Top > 32 && mousePoint.Y - Location.Y - Margin.Top <= 74))
                     {
                         handled = true;
                         return new IntPtr((int)Win32API.HitTest.HTCAPTION);
@@ -377,24 +383,19 @@ namespace Miiror
 
                 case Win32API.WM_GETMINMAXINFO:
                     WmGetMinMaxInfo(hwnd, lParam);
-                    if (WindowState == WindowState.Normal)
-                    {
-                        Max.Content = "2";
-                        Max.ToolTip = "Restore Down";
-                    }
-                    else if (WindowState == WindowState.Maximized)
-                    {
-                        Max.Content = "1";
-                        Max.ToolTip = "Maximize Window";
-                    }
-                    WindowStyleChange(WindowState);
-
                     handled = true;
                     break;
-
             }
 
             return IntPtr.Zero;
+        }
+
+        internal Point Location
+        {
+            get
+            {
+                return new Point(WindowState == WindowState.Maximized ? 0 : Left, WindowState == WindowState.Maximized ? 0 : Top);
+            }
         }
 
         private void WmGetMinMaxInfo(IntPtr hwnd, IntPtr lParam)
@@ -410,10 +411,10 @@ namespace Miiror
                 Win32API.GetMonitorInfo(monitor, monitorInfo);
                 Win32API.RECT rcWorkArea = monitorInfo.rcWork;
                 Win32API.RECT rcMonitorArea = monitorInfo.rcMonitor;
-                mmi.ptMaxPosition.x = Math.Abs(rcWorkArea.left - rcMonitorArea.left) - 3;
-                mmi.ptMaxPosition.y = Math.Abs(rcWorkArea.top - rcMonitorArea.top) - 3;
-                mmi.ptMaxSize.x = Math.Abs(rcWorkArea.right - rcWorkArea.left) + 6;
-                mmi.ptMaxSize.y = Math.Abs(rcWorkArea.bottom - rcWorkArea.top) + 6;
+                mmi.ptMaxPosition.x = Math.Abs(rcWorkArea.left - rcMonitorArea.left);// -3;
+                mmi.ptMaxPosition.y = Math.Abs(rcWorkArea.top - rcMonitorArea.top);// -3;
+                mmi.ptMaxSize.x = Math.Abs(rcWorkArea.right - rcWorkArea.left);// +6;
+                mmi.ptMaxSize.y = Math.Abs(rcWorkArea.bottom - rcWorkArea.top);// +6;
                 mmi.ptMinTrackSize.x = (int)this.MinWidth;
                 mmi.ptMinTrackSize.y = (int)this.MinHeight;
             }
@@ -461,16 +462,16 @@ namespace Miiror
             if (WindowState == WindowState.Normal)
             {
                 WindowState = WindowState.Maximized;
-                Max.Content = "2";
-                Max.ToolTip = "Restore Down";
+                //Max.Content = "2";
+                //Max.ToolTip = "Restore Down";
             }
             else
             {
                 WindowState = WindowState.Normal;
-                Max.Content = "1";
-                Max.ToolTip = "Maximize Window";
+                //Max.Content = "1";
+                //Max.ToolTip = "Maximize Window";
             }
-            WindowStyleChange(WindowState);
+            //WindowStyleChange(WindowState);
         }
 
         #endregion

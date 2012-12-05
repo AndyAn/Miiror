@@ -327,6 +327,11 @@ namespace Miiror
 
         public void Dispose()
         {
+            fsw.Changed -= new FileSystemEventHandler(fsw_Changed);
+            fsw.Created -= new FileSystemEventHandler(fsw_Changed);
+            fsw.Deleted -= new FileSystemEventHandler(fsw_Changed);
+            fsw.Renamed -= new RenamedEventHandler(fsw_Renamed);
+            fsw.Error -= new ErrorEventHandler(fsw_Error);
             fsw.Dispose();
             fsw = null;
 
@@ -334,6 +339,7 @@ namespace Miiror
 
             timer.Stop();
             timer.Enabled = false;
+            timer.Elapsed -= new ElapsedEventHandler(timer_Elapsed);
             timer.Dispose();
             timer = null;
 
