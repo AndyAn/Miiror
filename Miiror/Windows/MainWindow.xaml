@@ -4,7 +4,7 @@
         xmlns:form="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:local="clr-namespace:Miiror.Controls"
         Style="{DynamicResource MetroWindow}" ResizeMode="CanResize"
-        Title="MainWindow" Height="518" Width="740" Background="#353535"
+        Title="MainWindow" Height="640" Width="900" Background="#353535"
         WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" StateChanged="Window_StateChanged">
     
     <Window.Resources>

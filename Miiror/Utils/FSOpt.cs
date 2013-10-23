@@ -16,7 +16,7 @@ namespace Miiror.Utils
 
             try
             {
-                if (File.Exists(filePath))
+                if (File.Exists(filePath) || Directory.Exists(filePath))
                 {
                     result = ((File.GetAttributes(filePath) | FileAttributes.Directory) == FileAttributes.Directory);
                 }
@@ -31,6 +31,30 @@ namespace Miiror.Utils
                 else
                 {
                     result = (filePath.IndexOf(".", filePath.LastIndexOf(@"\")) == -1);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.GetInstance().WriteLog(ex.Message);
+                throw ex;
+            }
+
+            return result;
+        }
+
+        public static bool IsDirectory(string filePath, string refPath)
+        {
+            bool result = false;
+
+            try
+            {
+                if (File.Exists(filePath) || Directory.Exists(filePath))
+                {
+                    result = IsDirectory(filePath);
+                }
+                else
+                {
+                    result = IsDirectory(refPath);
                 }
             }
             catch (Exception ex)
@@ -93,7 +117,7 @@ namespace Miiror.Utils
                             return false;
                         }
 
-                        if (IsDirectory(targetPath))
+                        if (IsDirectory(targetPath, file.NewFile))
                         {
                             CreateDirectory(targetPath);
                         }
