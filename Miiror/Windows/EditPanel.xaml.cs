@@ -116,7 +116,33 @@ namespace Miiror
 
         private void Target_Click(object sender, RoutedEventArgs e)
         {
+            MessageBox msg = new MessageBox(this.Owner as MainWindow, "Yes - Windows Path\nNo - Linux Path", MessageBoxButton.YesNo);
+            msg.Owner = this.Owner;
+            msg.ShowDialog();
+            if (msg.Result == MessageBoxResult.No)
+            {
+            }
+            else
+            {
+                using (OpenFileDialogEx dialog = new OpenFileDialogEx())
+                {
+                    dialog.StartLocation = AddonWindowLocation.Right;
+                    dialog.DefaultViewMode = FolderViewMode.Icon;
+                    dialog.OpenDialog.InitialDirectory = Environment.SpecialFolder.MyComputer.ToString();
+                    dialog.OpenDialog.AddExtension = true;
+                    dialog.OpenDialog.Multiselect = false;
+                    dialog.OpenDialog.ValidateNames = false;
+                    dialog.OpenDialog.ShowDialog();
+                    Forms.DialogResult result = dialog.ShowDialog();
 
+                    if (result == Forms.DialogResult.OK)
+                    {
+                        Target.Content = dialog.OpenDialog.FileName;
+                    }
+
+                    dialog.Dispose();
+                }
+            }
         }
 
         private void FSE_DragEnter(object sender, DragEventArgs e)

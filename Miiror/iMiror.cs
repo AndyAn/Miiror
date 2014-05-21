@@ -53,9 +53,8 @@ namespace Miiror
                 if (mi.IsWorking)
                 {
                     DoLooseScan();
+                    SystemWatch(true);
                 }
-
-                SystemWatch(true);
             }
             catch (IOException IOex)
             {
@@ -197,19 +196,22 @@ namespace Miiror
 
         void SystemWatch(bool isStart)
         {
-            fsw.Changed += new FileSystemEventHandler(fsw_Changed);
-            fsw.Created += new FileSystemEventHandler(fsw_Changed);
-            fsw.Deleted += new FileSystemEventHandler(fsw_Changed);
-            fsw.Renamed += new RenamedEventHandler(fsw_Renamed);
-            fsw.Error += new ErrorEventHandler(fsw_Error);
-            fsw.Path = MirorItem.IsFolder ? MirorItem.Source : Path.GetDirectoryName(MirorItem.Source);
-            fsw.Filter = MirorItem.IsFolder ? "*.*" : MirorItem.Source;
-            fsw.IncludeSubdirectories = MirorItem.IsRecursive;
-            fsw.NotifyFilter = NotifyFilters.DirectoryName
-                             | NotifyFilters.FileName
-                             | NotifyFilters.LastWrite
-                             | NotifyFilters.Size;
-            fsw.EnableRaisingEvents = isStart;
+            if (fsw.EnableRaisingEvents != isStart)
+            {
+                fsw.Changed += new FileSystemEventHandler(fsw_Changed);
+                fsw.Created += new FileSystemEventHandler(fsw_Changed);
+                fsw.Deleted += new FileSystemEventHandler(fsw_Changed);
+                fsw.Renamed += new RenamedEventHandler(fsw_Renamed);
+                fsw.Error += new ErrorEventHandler(fsw_Error);
+                fsw.Path = MirorItem.IsFolder ? MirorItem.Source : Path.GetDirectoryName(MirorItem.Source);
+                fsw.Filter = MirorItem.IsFolder ? "*.*" : MirorItem.Source;
+                fsw.IncludeSubdirectories = MirorItem.IsRecursive;
+                fsw.NotifyFilter = NotifyFilters.DirectoryName
+                                 | NotifyFilters.FileName
+                                 | NotifyFilters.LastWrite
+                                 | NotifyFilters.Size;
+                fsw.EnableRaisingEvents = isStart;
+            }
         }
 
         public event CallBackEventHandler CallBack
@@ -258,6 +260,7 @@ namespace Miiror
         {
             timer.Stop();
             timer.Enabled = false;
+            SystemWatch(false);
             MirorItem = new MiirorItem()
             {
                 Filtered = MirorItem.Filtered,

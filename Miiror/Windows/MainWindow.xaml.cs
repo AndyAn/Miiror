@@ -66,6 +66,7 @@ namespace Miiror
             MiSettings = LoadConfig();
             InitializeMonitorList();
             BindListBox();
+            BindProgressBar();
 
             Startup.IsChecked = MiSettings.StartupWithWindows;
             Startup.ToolTip = string.Format(STARTUP_TOOLTIP, Startup.IsChecked.Value);
@@ -251,6 +252,7 @@ namespace Miiror
 
             UpdateMonitorList(mi);
             BindListBox();
+            BindProgressBar();
             SaveConfig();
         }
 
@@ -270,6 +272,11 @@ namespace Miiror
                         MiList.ItemsSource = null;
                     }
                 }), new object[] {this, System.EventArgs.Empty});
+        }
+
+        private void BindProgressBar()
+        {
+            throw new NotImplementedException();
         }
 
         private void WindowStyleChange(WindowState windowState)
@@ -606,7 +613,10 @@ namespace Miiror
                 {
                     if (item.MirorItem.Identity == identity)
                     {
+                        //DateTime dt = DateTime.Now;
+                        //System.Diagnostics.Debug.Print("Starting the loose scan...");
                         item.DoLooseScan();
+                        //System.Diagnostics.Debug.Print("The scan cost " + (DateTime.Now - dt).TotalMilliseconds.ToString() + " ms");
                     }
                 }
             }

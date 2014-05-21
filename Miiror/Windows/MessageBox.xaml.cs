@@ -35,6 +35,7 @@ namespace Miiror
 
             Title.Text = title;
             Message.Text = message;
+            Result = MessageBoxResult.None;
 
             switch (button)
             {
@@ -71,26 +72,29 @@ namespace Miiror
 
         #endregion
 
+        public MessageBoxResult Result { get; private set; }
+
         private void OKay_Click(object sender, RoutedEventArgs e)
         {
-
+            Result = MessageBoxResult.OK;
             this.Close();
         }
 
         private void Yes_Click(object sender, RoutedEventArgs e)
         {
-
+            Result = MessageBoxResult.Yes;
             this.Close();
         }
 
         private void No_Click(object sender, RoutedEventArgs e)
         {
-
+            Result = MessageBoxResult.No;
             this.Close();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
+            Result = MessageBoxResult.Cancel;
             this.Close();
         }
     }

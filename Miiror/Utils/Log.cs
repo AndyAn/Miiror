@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using ZetaLongPaths;
 
 namespace Miiror.Utils
 {
@@ -28,9 +29,9 @@ namespace Miiror.Utils
             this.LogPath = "logs";
             this.CreateLog(defaultLogName);
 
-            if (!Directory.Exists(LogPath))
+            if (!ZlpIOHelper.DirectoryExists(LogPath))
             {
-                Directory.CreateDirectory(LogPath);
+                ZlpIOHelper.CreateDirectory(LogPath);
             }
         }
 
@@ -111,10 +112,10 @@ namespace Miiror.Utils
 
                 logs.AddRange(logSet[logName]);
 
-                string[] allLogs = Directory.GetFiles(LogPath, logName + "_*.log", SearchOption.AllDirectories);
-                foreach (string log in allLogs)
+                ZlpFileInfo[] allLogs = ZlpIOHelper.GetFiles(LogPath, logName + "_*.log");
+                foreach (ZlpFileInfo log in allLogs)
                 {
-                    logs.AddRange(File.ReadAllLines(log).ToList<string>());
+                    logs.AddRange(File.ReadAllLines(log.FullName).ToList<string>());
                 }
 
                 IEnumerable<string> filteredLogs = logs.Select(p => p).Where(p => DateTime.Parse(p.Substring(0, 14)) >= start).Where(p => DateTime.Parse(p.Substring(0, 14)) <= end);

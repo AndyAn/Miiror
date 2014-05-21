@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
+using ZetaLongPaths;
 
 namespace Miiror.Utils
 {
@@ -28,41 +28,10 @@ namespace Miiror.Utils
 
         public List<FileItem> LooseScan()
         {
-            List<string> source = new List<string>();
-            List<string> target = new List<string>();
-            List<FileItem> results;
-
-            try
-            {
-                if (miirorItem.IsFolder)
-                {
-                    //source.AddRange(Directory.GetFileSystemEntries(miirorItem.Source, "*.*").ToList());
-                    //target.AddRange(Directory.GetFileSystemEntries(miirorItem.Target, "*.*").ToList());
-                    source.AddRange(Directory.GetDirectories(miirorItem.Source, "*.*", SearchOption.AllDirectories));
-                    source.AddRange(Directory.GetFiles(miirorItem.Source, "*.*", SearchOption.AllDirectories));
-                    target.AddRange(Directory.GetDirectories(miirorItem.Target, "*.*", SearchOption.AllDirectories));
-                    target.AddRange(Directory.GetFiles(miirorItem.Target, "*.*", SearchOption.AllDirectories));
-                }
-                else
-                {
-                    source.Add(miirorItem.Source);
-                    target.Add(miirorItem.Target);
-                }
-
-                source = FilterFiles(source);
-                target = FilterFiles(target);
-
-                results = CompareFSO(source, target, WatcherChangeTypes.Changed);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-            return results;
+            return RestrictScan(false);
         }
 
-        public List<FileItem> RestrictScan()
+        public List<FileItem> RestrictScan(bool isRestrict = true)
         {
             List<string> source = new List<string>();
             List<string> target = new List<string>();
@@ -78,6 +47,10 @@ namespace Miiror.Utils
                     source.AddRange(Directory.GetFiles(miirorItem.Source, "*.*", SearchOption.AllDirectories));
                     target.AddRange(Directory.GetDirectories(miirorItem.Target, "*.*", SearchOption.AllDirectories));
                     target.AddRange(Directory.GetFiles(miirorItem.Target, "*.*", SearchOption.AllDirectories));
+                    //source.AddRange(ZlpIOHelper.GetDirectories(miirorItem.Source, "*.*").Select(d => d.FullName));
+                    //source.AddRange(ZlpIOHelper.GetFiles(miirorItem.Source, "*.*", SearchOption.AllDirectories).Select(f => f.FullName));
+                    //target.AddRange(ZlpIOHelper.GetDirectories(miirorItem.Target, "*.*").Select(d => d.FullName));
+                    //target.AddRange(ZlpIOHelper.GetFiles(miirorItem.Target, "*.*", SearchOption.AllDirectories).Select(f => f.FullName));
                 }
                 else
                 {
@@ -89,7 +62,10 @@ namespace Miiror.Utils
                 target = FilterFiles(target);
 
                 results = CompareFSO(source, target, WatcherChangeTypes.Changed);
-                results.AddRange(CompareFSO(target, source, WatcherChangeTypes.Deleted));
+                if (isRestrict)
+                {
+                    results.AddRange(CompareFSO(target, source, WatcherChangeTypes.Deleted));
+                }
             }
             catch (Exception ex)
             {
@@ -126,6 +102,7 @@ namespace Miiror.Utils
             List<FileItem> results = new List<FileItem>();
             string targetFile = "";
             int index = 0;
+            string idxFile = "";
 
             try
             {
@@ -140,22 +117,31 @@ namespace Miiror.Utils
                 PathManager pm = PathManager.GetInstance(mi);
                 foreach (string entry in source)
                 {
-                    targetFile = pm.ConvertPath(entry);
-                    index = target.FindIndex(e => e.ToLower() == targetFile.ToLower());
-
-                    if (index == -1)
+                    try
                     {
-                        results.Add(new FileItem() { ChangeType = changeType, NewFile = (changeType == WatcherChangeTypes.Deleted) ? targetFile : entry, OldFile = "" });
-                    }
-                    else
-                    {
-                        if (changeType == WatcherChangeTypes.Changed)
+                        targetFile = pm.ConvertPath(entry);
+                        //index = target.FindIndex(e => e.ToLower() == targetFile.ToLower());
+                        idxFile = target.AsParallel().FirstOrDefault(e => e.ToLower() == targetFile.ToLower());
+                        //if (index == -1)
+                        if (idxFile.Length == 0)
                         {
-                            if (new FileInfo(entry).LastWriteTime > new FileInfo(targetFile).LastWriteTime)
+                            results.Add(new FileItem() { ChangeType = changeType, NewFile = (changeType == WatcherChangeTypes.Deleted) ? targetFile : entry, OldFile = "" });
+                        }
+                        else
+                        {
+                            if (changeType == WatcherChangeTypes.Changed)
                             {
-                                results.Add(new FileItem() { ChangeType = WatcherChangeTypes.Changed, NewFile = entry, OldFile = "" });
+                                //if (new ZlpFileInfo(entry).LastWriteTime > new ZlpFileInfo(targetFile).LastWriteTime)
+                                if (ZlpIOHelper.GetFileLastWriteTime(entry) > ZlpIOHelper.GetFileLastWriteTime(targetFile))
+                                {
+                                    results.Add(new FileItem() { ChangeType = WatcherChangeTypes.Changed, NewFile = entry, OldFile = "" });
+                                }
                             }
                         }
+                    }
+                    catch (Exception xxx)
+                    {
+                        continue;
                     }
                 }
             }

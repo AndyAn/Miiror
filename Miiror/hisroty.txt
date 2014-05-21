@@ -1,4 +1,12 @@
-﻿2012-11-14                   Version 1.0
+﻿2014-05-19                 Version 1.1.0
+----------------------------------------
+* Import Open-Source "ZetaLongPaths" to
+  fix the long path issue.
+* Fixed directory checking bugs.
+* Performance tuning for the files / 
+  directories comparision.
+
+2012-11-14                 Version 1.0.3
 ----------------------------------------
 * Fixed Maximize / Restore bugs.
 * Move all window files to Windows
@@ -6,13 +14,13 @@
   better.
 
 
-2012-11-08                   Version 1.0
+2012-11-08                 Version 1.0.2
 ----------------------------------------
 * The first release version. Metro UI
   with basic monitoring function.
 
 
-2012-11-07                   Version 1.0
+2012-11-07                 Version 1.0.0
 ----------------------------------------
 * Fixed Run with Windows Start-up bugs.
 * Add a function to format JSON setting

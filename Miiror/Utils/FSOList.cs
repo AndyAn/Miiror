@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
+using ZetaLongPaths;
 
 namespace Miiror.Utils
 {
@@ -23,7 +21,7 @@ namespace Miiror.Utils
             {
                 foreach (FSObject item in list)
                 {
-                    if (File.Exists(item.FullPathName))
+                    if (ZlpIOHelper.FileExists(item.FullPathName))
                     {
                         fl.Add(item);
                     }

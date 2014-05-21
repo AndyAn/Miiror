@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.IO;
+using IO = System.IO;
 using System.Diagnostics;
 using System.Threading;
+using ZetaLongPaths;
+using ZetaLongPaths.Native;
 
 namespace Miiror.Utils
 {
@@ -16,9 +18,9 @@ namespace Miiror.Utils
 
             try
             {
-                if (File.Exists(filePath) || Directory.Exists(filePath))
+                if (ZlpIOHelper.FileExists(filePath) || ZlpIOHelper.DirectoryExists(filePath))
                 {
-                    result = ((File.GetAttributes(filePath) | FileAttributes.Directory) == FileAttributes.Directory);
+                    result = ((ZlpIOHelper.GetFileAttributes(filePath) & FileAttributes.Directory) == FileAttributes.Directory);
                 }
                 else if (FSOList.IsFolder(filePath))
                 {
@@ -48,7 +50,7 @@ namespace Miiror.Utils
 
             try
             {
-                if (File.Exists(filePath) || Directory.Exists(filePath))
+                if (ZlpIOHelper.FileExists(filePath) || ZlpIOHelper.DirectoryExists(filePath))
                 {
                     result = IsDirectory(filePath);
                 }
@@ -83,13 +85,13 @@ namespace Miiror.Utils
                     basePath = directory.Split('\\')[0];
                 }
 
-                if (Directory.Exists(basePath))
+                if (ZlpIOHelper.DirectoryExists(basePath))
                 {
-                    Directory.CreateDirectory(directory);
+                    ZlpIOHelper.CreateDirectory(directory);
                 }
                 else
                 {
-                    throw new DirectoryNotFoundException("Path root doesn't exist.");
+                    throw new IO.DirectoryNotFoundException("Path root doesn't exist.");
                 }
             }
             catch (Exception ex)
@@ -110,9 +112,9 @@ namespace Miiror.Utils
 
                 switch (file.ChangeType)
                 {
-                    case WatcherChangeTypes.Changed:
-                        if ((File.GetAttributes(file.NewFile) | FileAttributes.Offline) == FileAttributes.Offline
-                         || (File.Exists(targetPath) && (File.GetAttributes(targetPath) | FileAttributes.Offline) == FileAttributes.Offline))
+                    case IO.WatcherChangeTypes.Changed:
+                        if ((ZlpIOHelper.GetFileAttributes(file.NewFile) & FileAttributes.Offline) == FileAttributes.Offline
+                         || (ZlpIOHelper.FileExists(targetPath) && (ZlpIOHelper.GetFileAttributes(targetPath) & FileAttributes.Offline) == FileAttributes.Offline))
                         {
                             return false;
                         }
@@ -123,28 +125,28 @@ namespace Miiror.Utils
                         }
                         else
                         {
-                            File.Copy(file.NewFile, targetPath, true);
+                            ZlpIOHelper.CopyFile(file.NewFile, targetPath, true);
                         }
 
                         break;
-                    case WatcherChangeTypes.Deleted:
-                        if ((File.GetAttributes(targetPath) | FileAttributes.Offline) == FileAttributes.Offline)
+                    case IO.WatcherChangeTypes.Deleted:
+                        if ((ZlpIOHelper.GetFileAttributes(targetPath) & FileAttributes.Offline) == FileAttributes.Offline)
                         {
                             return false;
                         }
 
                         if (IsDirectory(targetPath))
                         {
-                            Directory.Delete(targetPath, true);
+                            ZlpIOHelper.DeleteDirectory(targetPath, true);
                         }
                         else
                         {
-                            File.Delete(targetPath);
+                            ZlpIOHelper.DeleteFile(targetPath);
                         }
 
                         break;
-                    case WatcherChangeTypes.Renamed:
-                        Directory.Move(pm.ConvertPath(file.OldFile), targetPath);
+                    case IO.WatcherChangeTypes.Renamed:
+                        ZlpIOHelper.MoveDirectory(pm.ConvertPath(file.OldFile), targetPath);
 
                         break;
                 }
@@ -166,7 +168,7 @@ namespace Miiror.Utils
 
             try
             {
-                string ext = Path.GetExtension(file).TrimStart('.').ToLower();
+                string ext = ZlpPathHelper.GetExtension(file).TrimStart('.').ToLower();
                 ext = string.IsNullOrEmpty(ext) ? ext : "*." + ext;
 
                 result = !(removeList.FindIndex(e => e.ToLower() == ext) > -1);
@@ -191,9 +193,9 @@ namespace Miiror.Utils
         {
             try
             {
-                string fileName = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
+                string fileName = ZlpPathHelper.Combine(ZlpPathHelper.GetTempDirectoryPath(), ZlpPathHelper.GetTempFilePath());
 
-                File.WriteAllLines(fileName, fileList.Select(f => string.Format("{0}\t{1}", f.ChangeType, f.NewFile)).ToArray(), Encoding.UTF8);
+                ZlpIOHelper.WriteAllText(fileName, string.Join("\r\n", fileList.Select(f => string.Format("{0}\t{1}", f.ChangeType, f.NewFile)).ToArray()));
 
                 Process.Start("notepad", fileName);
             }
@@ -208,7 +210,7 @@ namespace Miiror.Utils
             // The temporary folder path existence flag
             bool isTempPathExist = false;
 
-            if (!Directory.Exists(monitorPath))
+            if (!ZlpIOHelper.DirectoryExists(monitorPath))
             {
                 // Retry to connect the Temporary folder
                 int i;
@@ -235,7 +237,7 @@ namespace Miiror.Utils
         {
             try
             {
-                if (Directory.Exists(monitorPath))
+                if (ZlpIOHelper.DirectoryExists(monitorPath))
                 {
                     return true;
                 }
